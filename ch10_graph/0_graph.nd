@@ -1,0 +1,480 @@
+---
+
+## 서로소 집합
+
+- `서로소 집합` 자료구조
+    - 서로소 부분 집합들로 나누어진, 원소들의 데이터를 처리하기 위한 자료구조
+    - `union` 연산 : 하나의 합집합으로 합치는 연산
+    - `find` 연산 : 특정 원소가 속한 집합이 어떤 집합인지 알려주는 연산
+
+- 트리 구조로 표현됨
+    1. union으로 연결된 두 노드 a, b를 확인
+    2. a, b의 루트 노드 A, B를 탐색
+    3. A를 B의 부모 노드로 설정 (앞번호가 부모가 되도록)
+    4. 모든 union을 처리할 때까지 1번 과정 반복
+    
+    - ex) union (1,4), (2,3), (2,4), (5,6)
+        
+        ![2024-03-18_22-57-15.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/4011d059-9b85-400a-baa4-e60ba6f31789/2024-03-18_22-57-15.jpg)
+        
+    - 구현 방법 :
+        1. union 1,4 처리
+            
+            ![2024-03-18_22-58-29.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/54d80bf2-a9a2-4ad1-9530-abc3509af2ff/2024-03-18_22-58-29.jpg)
+            
+        2. … 모든 union에 대해 반복
+            
+            ![2024-03-18_23-11-25.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/4ee885f4-5b4a-4153-81f7-e06c0d77ede2/2024-03-18_23-11-25.jpg)
+            
+        
+
+### 간단한 서로소 집합 알고리즘
+
+```python
+# 특정 원소 속한 집합 찾기
+def find_parent(parent, x):
+		# 루트 노드가 아닐 경우 재귀적으로 호출
+		if (parent[x] != x) :
+				return find_parent(parent, parent[x])
+		return x
+
+# 두 원소 속한 집합 합치기
+def union_parent(parent, a, b):
+		a = find_parent(parent, a)
+		b = find_parent(parent, b)
+		if (a < b):
+				parent[b] = a
+		else :
+				parent[a] = b
+
+# 노드 개수, 간선(union) 개수 입력받기
+v, e = map(int, input().split())
+
+# 부모 테이블 0으로 설정하기
+parent = [0] * (v+1)
+
+# 부모 테이블에 자기 자신으로 초기화하기
+for i in range(1, v+1):
+		parent[i] = 1
+		
+# union 연산 입력받고 수행하기
+for i in range(e):
+		a, b = map(int, input().split())
+		union_parent(parent, a, b)
+
+# 각 원소가 속한 집합 출력하기
+for i in range(1, v+1):
+		print(find_parent(parent, i), end=' ')
+		
+# 부모 테이블 출력하기
+for i in range(1, v+1):
+		print(parent[i], end=' ')
+```
+
+### 개선된 서로소 집합 알고리즘
+
+- 기본의 경우, find 함수가 모든 노드를 확인해보아야해 최악의 경우 `O(V)`
+- `경로 압축 기법`으로 복잡도 개선 가능
+    - find 함수를 재귀적으로 호출한 후 부모 테이블 갱신하는 기법
+    
+    ```python
+    # 특정 원소 속한 집합 찾기
+    def find_parent(parent, x):
+    		if (parent[x] != x) :
+    				parent[x] = find_parent(parent, parent[x])
+    		return parent[x]
+    ```
+    
+    - 루트 노드를 바로 부모 노드로 설정
+        
+        ![2024-03-18_23-27-57.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/363d9bc3-b054-474c-9980-d34a1f419f3e/2024-03-18_23-27-57.jpg)
+        
+
+### 서로소 집합을 활용한 사이클 판별
+
+- `무방향 그래프` 내의 `사이클 판별` 가능
+- 방향 그래프 : DFS를 활용해야 함
+- 방법 : 간선을 하나씩 확인해보며 두 노드가 포함되어 있는 집합을 합치면 판별 가능
+    
+    ```python
+    cycle = False
+    
+    for i in range(e):
+    		a, b = map(int, input().split())
+    		if (find_parent(parent, a) == find_parent(parent, b)):
+    				cycle = True
+    				break
+    		else :
+    				union_parent(parent, a, b)
+    				
+    print(cycle)
+    ```
+    
+
+## 신장 트리 (Spanning Tree)
+
+- 신장 트리
+    - 모든 노드를 포함하면서 사이클이 존재하지 않는 부분 그래프
+        
+        ![2024-03-18_23-48-09.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/a3b517d5-d2bb-4e55-a006-066f0283cf5d/2024-03-18_23-48-09.jpg)
+        
+
+### 크루스칼 알고리즘
+
+- 최소 비용으로 만들 수 있는 신장 트리를 찾는 알고리즘
+    
+    ![2024-03-18_23-49-49.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/ee8b22b4-4a59-4731-a9c9-b07110501a13/2024-03-18_23-49-49.jpg)
+    
+- `그리디 알고리즘`의 유형
+- 모든 간선에 대해서 정렬을 수행한 뒤, 가장 거리가 짧은 간선부터 집합에 포함
+- 단, 사이클을 일으키는 간선은 포함 X
+- 최종적으로 신장 트리에 포함되는 간선의 개수는 `노드의 개수 - 1`
+- 복잡도 : `O(ElogE)` - E : 간선 개수
+
+- 사진 예시 :
+    1. 모든 간선 정보를 가져와서 나열 & 정렬
+        
+        ![2024-03-18_23-54-06.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/a717c1c7-1af6-4a1a-95c3-a8ac0c3160f1/2024-03-18_23-54-06.jpg)
+        
+    2. 가장 비용이 낮은 간선부터 선택 후 union
+        
+        ![2024-03-18_23-55-47.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/161253f0-ad61-4776-a43f-56e3ec1faac2/2024-03-18_23-55-47.jpg)
+        
+    3. …계속해서 반복…
+    4. 선택된 두 노드가 동일한 집합에 포합되어 있는 경우 union X
+        
+        ![2024-03-18_23-57-08.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/80ca0264-5f9a-4318-b66f-8b16bd86b2e7/2024-03-18_23-57-08.jpg)
+        
+    5. 모든 간선에 대해 수행
+        
+        ![2024-03-18_23-58-24.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/62f8559d-3074-4390-85de-0d32a9ea86e7/2024-03-18_23-58-24.jpg)
+        
+    
+    - 구현 :
+        
+        ```python
+        # 노드 개수, 간선(union) 개수 입력받기
+        v, e = map(int, input().split())
+        
+        # 부모 테이블 0으로 설정하기
+        parent = [0] * (v+1)
+        
+        # 부모 테이블에 자기 자신으로 초기화하기
+        for i in range(1, v+1):
+        		parent[i] = 1
+        
+        # 간선, 최종 비용 담을 변수 설정하기
+        edges = []
+        result = 0
+        
+        # 모든 간선 정보 입력받기
+        for _ in range(e):
+        		a, b, cost = map(int, input().split())
+        		edges.append((cost,a,b))
+        
+        # 간선 비용순으로 정렬하기
+        edges.sort()
+        
+        # 간선 하나씩 확인하기
+        for edge in edges:
+        		cost, a, b = edge
+        		# 사이클이 발생하지 않으면 집합 포함
+        		if (find_parent(parent, a) != find_parent(parent, b)):
+        				union_parent(parent, a, b)
+        				result += cost
+        				
+        print(result)
+        ```
+        
+    
+
+## 위상 정렬 (Topology Sort)
+
+- 순서가 정해져 있는 일련의 작업을 차례대로 수행해야 할 때 사용
+- 방향 그래프의 모든 노드를 ‘방향성에 거스르지 않도록 순서대로 나열’
+- 복잡도 : `O(V+E)`
+- ex) 선수과목을 고려한 학습 순서 설정
+    
+    ![2024-03-19_00-27-28.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/dcb27098-005c-4119-8029-7bc461f4dfe4/2024-03-19_00-27-28.jpg)
+    
+- 방법 :
+    1. `진입차수`(노드에 들어오는 간선 수 = 0)가 `0인 노드`를 `큐`에 넣음
+    2. 큐가 빌 때까지 다음을 반복
+        1. 큐에서 원소를 꺼내 해당 노드에서 출발하는 간선을 그래프에서 제거
+        2. 새롭게 진입차수가 0이 된 노드를 큐에 넣음
+    
+- 사진 예시 :
+    1. 진입차수 0인 노드 큐에 삽입 후 제거
+        
+        ![2024-03-19_00-47-58.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/03fdd3d8-108e-47a4-a03c-87e49654888f/2024-03-19_00-47-58.jpg)
+        
+    2. 간선 제거 후 0이 된 노드 차례대로 삽입
+        
+        ![2024-03-19_00-48-31.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/068dafa5-d641-4a63-b6b1-c89a26c3b379/2024-03-19_00-48-31.jpg)
+        
+    3. 큐에 있는 노드 차례대로 제거
+        
+        ![2024-03-19_00-49-11.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/81f3f7d6-9b35-49d0-931b-5e0a5fe6df09/2024-03-19_00-49-11.jpg)
+        
+    4. … 모두 반복
+        
+        ![2024-03-19_00-49-53.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/d8ac88bc-7c9e-4759-9b9e-b8acccfcfe15/2024-03-19_00-49-53.jpg)
+        
+        - 큐에서 빠져나간 노드를 순서대로 출력하면 수행 결과가 표시됨
+            - 1 - 2 - 5 - 3 - 6 - 4 - 7
+            - 1 - 5 - 2 - 3 - 6 - 4 - 7 도 가능 (여러가지 답 존재)
+            
+- 구현 :
+    
+    ```python
+    from collections import deque
+    
+    # 노드 개수, 간선(union) 개수 입력받기
+    v, e = map(int, input().split())
+    
+    # 0으로 초기화된 진입차수 리스트 설정하기
+    indegree = [0] * (v+1)
+    
+    # 간선 정보 담을 2차원 리스트 설정하기
+    graph = [[] for i in range(v+1)]
+    
+    # 모든 간선 정보 입력받기 & 진입차수 기록하기
+    for _ in range(e):
+    		a, b = map(int, input().split())
+    		graph[a].append(b)
+    		indegree[b] += 1
+    		
+    # 위상 정렬
+    def topology_sort():
+    		result = []
+    		q = deque()
+    		
+    		# 진입차수가 0인 노드를 큐에 삽입
+    		for i in range(1, v+1):
+    				if (indegree[i] == 0):
+    						q.append(i)
+    		
+    		# 큐가 빌 때까지 반복
+    		while q:
+    				# 큐에서 원소 뺴내기
+    				now = q.popleft()
+    				result.append(now)
+    				# 연결된 노드의 진입차수 뺴기
+    				for i in graph[now]:
+    						indegree[i] -= 1
+    						# 진입차수가 0이 되면 큐에 넣기
+    						if (indegree[i] == 0):
+    								q.append(i)
+    
+    		# 결과 출력
+    		for i in result:
+    				print(i, end=' ')
+    
+    topology_sort()
+    ```
+    
+
+## 2. 연산으로 팀 결성하기
+
+<aside>
+❔ 0번부터 N번까지의 N+1명의 학생이 있다. 처음에는 모든 다른 팀으로, N+1개의 팀이 있다.
+(1 ≤ N ≤ 100,000)
+
+선생님은 ‘팀 합치기’ (0번) 연산과 ‘같은 팀 여부 확인하기’ (1번) 연산이 가능하다.
+
+선생님이 연산을 총 M번 할 때, 확인 연산의 결과값들을 모두 출력하시오.
+(1 ≤ M ≤ 100,000)
+
+</aside>
+
+![2024-03-19_02-43-07.jpg](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/a4098881-d255-4466-9ac3-440079e715d6/2024-03-19_02-43-07.jpg)
+
+- 풀이
+    - `서로소 집합 알고리즘 문제`
+    - 경로 압축 방식의 서로소 집합 자료구소 사용해야 함
+    
+    ```python
+    
+    # 특정 원소 속한 집합 찾기
+    def find_parent(parent, x):
+    	if (parent[x] != x) :
+    		parent[x] = find_parent(parent, parent[x])
+    	return parent[x]
+    
+    # 두 원소 속한 집합 합치기
+    def union_parent(parent, a, b):
+        a = find_parent(parent, a)
+        b = find_parent(parent, b)
+        if (a < b):
+            parent[b] = a
+        else :
+            parent[a] = b
+    
+    # N, M 입력받기
+    n, m = map(int, input().split())
+    
+    # 부모 테이블 0으로 설정하기
+    parent = [0] * (n+1)
+    
+    # 부모 테이블에 자기 자신으로 초기화하기
+    for i in range(1, n+1):
+        parent[i] = 1
+    		
+    # 연산 입력받고 해당 연산 수행하기
+    for i in range(m):
+        oper, a, b = map(int, input().split())
+        if (oper == 0):
+            union_parent(parent,a,b)
+        elif (oper == 1):
+            if (find_parent(parent,a) == find_parent(parent,b)):
+                print("YES")
+            else:
+                print("NO")
+    ```
+    
+
+## 3. 마을을 2개로 분할하기
+
+<aside>
+❔ 마을은 N개의 집과 집들을 연결하는 M개의 길로 이루어져 있다. 길들은 길을 유지하는데 각각의 유지비가 소요된다.
+(2 ≤ N ≤ 100,000, 1 ≤ M ≤ 1,000,000, 1 ≤ 유지비 ≤ 1,000)
+
+각 분리된 마을 안에 집들이 서로 분리되도록 마을을 2개로 분리하고자 한다.
+
+길들을 최소화하여 유지비의 합을 최소로 하는 비용을 구하시오.
+
+</aside>
+
+- 풀이
+    - 전체 그래프를 `2개의 최소 신장 트리`로 구성하기
+    - 크루스칼 알고리즘으로 최소 신장 트리를 찾은 후 가장 비용이 큰 간선 제거해서 두개로 분리하기
+    
+    ```python
+    
+    # 특정 원소 속한 집합 찾기
+    def find_parent(parent, x):
+    	if (parent[x] != x) :
+    		parent[x] = find_parent(parent, parent[x])
+    	return parent[x]
+    
+    # 두 원소 속한 집합 합치기
+    def union_parent(parent, a, b):
+        a = find_parent(parent, a)
+        b = find_parent(parent, b)
+        if (a < b):
+            parent[b] = a
+        else :
+            parent[a] = b
+    
+    # 노드 개수, 간선(union) 개수 입력받기
+    v, e = map(int, input().split())
+    
+    # 부모 테이블 0으로 설정하기
+    parent = [0] * (v+1)
+    
+    # 부모 테이블에 자기 자신으로 초기화하기
+    for i in range(1, v+1):
+        parent[i] = 1
+    
+    # 간선, 최종 비용 담을 변수 설정하기
+    edges = []
+    result = 0
+    
+    # 모든 간선 정보 입력받기
+    for _ in range(e):
+        a, b, cost = map(int, input().split())
+        edges.append((cost,a,b))
+    
+    # 간선 비용순으로 정렬하기
+    edges.sort()
+    
+    # 최소 신장 트리 중 가장 비용이 큰 간선
+    last = 0
+    
+    # 간선 하나씩 확인하기
+    for edge in edges:
+        cost, a, b = edge
+        # 사이클이 발생하지 않으면 집합 포함
+        if (find_parent(parent, a) != find_parent(parent, b)):
+            union_parent(parent, a, b)
+            result += cost
+            last = cost
+    
+    # 가장 비용이 큰 간선 제외 비용
+    print(result - cost)
+    ```
+    
+
+## 4. 최단 시간 커리큘럼 찾기
+
+<aside>
+❔ 번호가 1~N인 N개의 온라인 강의에는 각각 선수 강의가 있을 수 있다.
+(1 ≤ N ≤ 500)
+
+강의마다 강의 시간이 일정하지 않으며, 동시에 여러 강의를 들을 수 있을 때, N개의 강의를 모두 수강하기 위해 소요되는 최소 시간을 구하시오.
+(1 ≤ 강의시간 ≤ 100,000)
+
+</aside>
+
+![선수강의 입력 끝나면 -1로 알림](https://prod-files-secure.s3.us-west-2.amazonaws.com/edfd69d1-6c01-4d0c-9269-1bae8a4e3915/191a3e23-33ba-4477-b00d-0a80f7c7b0a4/2024-03-19_03-01-59.jpg)
+
+선수강의 입력 끝나면 -1로 알림
+
+- 풀이
+    - `위상 정렬 알고리즘`의 응용문제
+    - 인접한 노드 확인할 때, 현재보다 강의 시간이 더 긴 경우를 찾는 경우 오랜 시간이 걸리는 시간 값을 저장하는 방식으로 구성
+    - 매번 간선 정보를 확인하며 결과 테이블 갱신
+    
+    ```python
+    
+    from collections import deque
+    import copy
+    
+    # 노드 개수 입력받기
+    v = input().split()
+    
+    # 0으로 초기화된 진입차수 리스트 설정하기
+    indegree = [0] * (v+1)
+    
+    # 0으로 초기화된 강의시간 리스트 설정하기
+    time = [0] * (v+1)
+    
+    # 간선 정보 담을 2차원 리스트 설정하기
+    graph = [[] for i in range(v+1)]
+    
+    # 모든 간선 정보 입력받기 & 진입차수 기록하기
+    for i in range(1, v+1):
+        data = list(map(int, input().split()))
+        time[i] = data[0]
+        for x in data[1:-1] :
+            indegree[i] += 1
+            graph[x].append(i)
+    		
+    # 위상 정렬
+    def topology_sort():
+        result = copy.deepcopy(time)
+        q = deque()
+        
+        # 진입차수가 0인 노드를 큐에 삽입
+        for i in range(1, v+1):
+            if (indegree[i] == 0):
+                q.append(i) 
+        
+        # 큐가 빌 때까지 반복
+        while q:
+            # 큐에서 원소 뺴내기
+            now = q.popleft()
+            # 연결된 노드의 진입차수 뺴기
+            for i in graph[now]:
+                result = max(result[i], result[now]+time[i])
+                indegree[i] -= 1
+                # 진입차수가 0이 되면 큐에 넣기
+                if (indegree[i] == 0):
+                    q.append(i) 
+    
+        # 결과 출력
+        for i in range(1, v+1):
+                print(result[i])
+    
+    topology_sort()
+    ```
