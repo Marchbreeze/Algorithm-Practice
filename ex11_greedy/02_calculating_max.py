@@ -12,6 +12,7 @@ number = input()
 # 연산 결과 초기화 후 첫 글자 넣기
 result = int(number[0])
 
+# 0,1이 아닌 경우 곱셈 진행하기
 for i in range(1, len(number)):
     num = int(number[i])
     if (num <= 1 or result <= 1):
@@ -19,4 +20,5 @@ for i in range(1, len(number)):
     else:
         result *= num
 
+# 결과값 출력하기
 print(result)
