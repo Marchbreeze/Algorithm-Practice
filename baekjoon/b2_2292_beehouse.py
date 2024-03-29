@@ -32,3 +32,4 @@ if (right - left == 2) :
     print(right - 1)
 else :
     print(right)
+    
