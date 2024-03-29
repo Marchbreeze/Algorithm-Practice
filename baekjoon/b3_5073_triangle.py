@@ -28,3 +28,4 @@ def check_triangle(tri):
 # 입력된 모든 삼각형 확인
 for tri in input_list:
     check_triangle(tri)
+    
