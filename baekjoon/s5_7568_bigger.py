@@ -26,4 +26,5 @@ for i in range(n):
             rank[i] += 1
 
 # 결과 출력
-print(' '.join(rank))
+for i in range(n):
+    print(rank[i], end=' ')
