@@ -74,5 +74,5 @@ for i in range(head_row+2+waist,n):
         break
 
 # 결과 출력
-print(head_row+2,head_col+1)
-print(arm_left,' ',arm_right,' ',waist,' ',leg_left,' ',leg_right)
+print(head_row+2, head_col+1)
+print(arm_left, arm_right, waist, leg_left, leg_right)
