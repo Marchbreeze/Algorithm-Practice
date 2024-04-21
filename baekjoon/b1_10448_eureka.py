@@ -20,6 +20,8 @@ def find(n):
                 if tri[i]+tri[j]+tri[k] == n:
                     return 1
     return 0
+
+# 테스트 케이스 계산
 for _ in range(k):
     n = int(input())
     print(find(n))
