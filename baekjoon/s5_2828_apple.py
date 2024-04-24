@@ -16,11 +16,11 @@ basket = 1
 result = 0
 for _ in range(j):
     apple = int(input())
-    print("@", basket, apple, result)
     if (apple > (basket + m - 1)):
         result += apple - basket - m + 1
         basket += apple - basket - m + 1
     elif (apple < basket):
         result += basket - apple
         basket -= basket - apple
-    print("$", basket, apple, result)
+
+print(result)
