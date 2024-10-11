@@ -40,9 +40,5 @@ for spin in spins:
     # 회전
     for j in range(4):
         q[j].rotate(need_spin[j])
-    
-    for j in range(4):
-        print(q[j])
-    
 
 print(q[0][0] + q[1][0]*2 + q[2][0]*4 + q[3][0]*8)
