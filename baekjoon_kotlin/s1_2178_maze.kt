@@ -6,7 +6,6 @@ https://www.acmicpc.net/problem/2178
 
 import java.io.*
 import java.util.*
-import kotlin.collections.ArrayDeque
 
 val dx = intArrayOf(1,-1,0,0)
 val dy = intArrayOf(0,0,1,-1)
