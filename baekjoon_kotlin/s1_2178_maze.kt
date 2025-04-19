@@ -12,7 +12,7 @@ val dy = intArrayOf(0,0,1,-1)
 
 fun isOutOfRange(y: Int, x: Int, n: Int, m:Int): Boolean = y < 0 || x < 0 || y >= n || x >= m
 
-fun main() = with(BufferedReader(InputStreamReader(System.`in`))){
+private fun main() = with(BufferedReader(InputStreamReader(System.`in`))){
     // 입력
     val (n, m) = readLine().split(" ").map { it.toInt() }
     val maze = Array(n) { readLine().map { it - '0' }.toIntArray() }
