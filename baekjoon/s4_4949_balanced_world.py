@@ -4,29 +4,29 @@
 https://www.acmicpc.net/problem/4949
 '''
 
-while True:
-    text = input()
-    if text == ".":
-        break
+while True :
+    a = input()
     stack = []
-    answer = "yes"
-    for char in text:
-        if char == "(" or char == "[":
-            stack.append(char)
-        elif char == ")":
-            if len(stack) == 0:
-                answer = "no"
-                continue
-            prev = stack.pop()
-            if prev != "(":
-                answer = "no"
-                continue
-        elif char == "]":
-            if len(stack) == 0:
-                answer = "no"
-                continue
-            prev = stack.pop()
-            if prev != "[":
-                answer = "no"
-                continue
-    print(answer)
+
+    if a == "." :
+        break
+
+    for i in a :
+        if i == '[' or i == '(' :
+            stack.append(i)
+        elif i == ']' :
+            if len(stack) != 0 and stack[-1] == '[' :
+                stack.pop()
+            else : 
+                stack.append(']')
+                break
+        elif i == ')' :
+            if len(stack) != 0 and stack[-1] == '(' :
+                stack.pop()
+            else :
+                stack.append(')')
+                break
+    if len(stack) == 0 :
+        print('yes')
+    else :
+        print('no')
