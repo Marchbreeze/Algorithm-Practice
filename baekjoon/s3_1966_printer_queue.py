@@ -4,23 +4,24 @@
 https://www.acmicpc.net/problem/1966
 '''
 
-from collections import deque
-import heapq
-
 t = int(input())
+
 for _ in range(t):
     n, m = map(int, input().split())
-    array = list(map(int, input().split()))
-    q = deque(array)
-    h = [-i for i in array]
-    count = 0
-    while True:
-        aim = heapq.heappop(h) * -1
-        poped = q.popleft()
-        while aim != poped:
-            q.append(poped)
-            poped = q.popleft()
-        count += 1
-        if poped == m:
-            print(count)
-            break
+    data = list(map(int, input().split()))
+    
+    result = 1
+    while data:
+        if data[0] < max(data):
+            data.append(data.pop(0))
+
+        else:
+            if m == 0: 
+                break
+
+            data.pop(0)
+            result += 1
+
+        m = m - 1 if m > 0 else len(data) - 1
+
+    print(result)
