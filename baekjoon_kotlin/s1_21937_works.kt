@@ -18,17 +18,20 @@ private fun main() = with(BufferedReader(InputStreamReader(System.`in`))){
     val x = readLine().toInt()
 
     val visited = BooleanArray(n+1) {false}
+    visited[x] = true
 
     val stack = mutableListOf<Int>()
     stack.add(x)
 
-    var count = -1
+    var count = 0
     while (stack.isNotEmpty()) {
         val work = stack.removeLast()
-        visited[work] = true
-        count += 1
-        works[work].forEach{ item ->
-            if (visited[item] == false) stack.add(item)
+        works[work].forEach { item ->
+            if (!visited[item]) {
+                visited[item] = true
+                stack.add(item)
+                count += 1
+            }
         }
     }
     println(count)
